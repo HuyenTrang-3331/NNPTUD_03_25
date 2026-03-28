@@ -1,8 +1,14 @@
+//inventory
+//cart
+//reservation
+//payments
 var express = require('express');
 var router = express.Router();
 const slugify = require('slugify');
 let productModel = require('../schemas/products')
-let inventoryModel = require('../schemas/inventories')
+let inventoryModel = require('../schemas/inventories');
+const products = require('../schemas/products');
+let mongoose = require('mongoose')
 
 /* GET users listing. */
 router.get('/', async function (req, res, next) {
@@ -45,6 +51,8 @@ router.get('/:id', async function (req, res, next) {
   }
 });
 router.post('/', async function (req, res, next) {
+  let session = await mongoose.startSession()
+  session.startTransaction()
   try {
     let newProduct = new productModel({
       title: req.body.title,
@@ -58,19 +66,20 @@ router.post('/', async function (req, res, next) {
       images: req.body.images,
       category: req.body.category
     })
-    await newProduct.save();
+    await newProduct.save({ session })
     let newInventory = new inventoryModel({
       product: newProduct._id,
-      stock: 0,
-      reserved: 0,
-      soldCount: 0
+      stock: 0
     })
-    await newInventory.save();
-    res.send(newProduct)
+    await newInventory.save({ session });
+    await newInventory.populate('product')
+    await session.commitTransaction();
+    await session.endSession()
+    res.send(newInventory)
   } catch (error) {
-    res.status(400).send({
-      message: error.message
-    })
+    await session.abortTransaction();
+    await session.endSession()
+    res.status(404).send(error.message)
   }
 })
 router.put('/:id', async function (req, res, next) {

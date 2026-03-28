@@ -1,6 +1,10 @@
 let mongoose = require('mongoose');
 let productsSchema = mongoose.Schema({
-
+    sku: {
+        type: String,
+        required: [true, "title khong duoic rong"],
+        unique: true
+    },
     title: {
         type: String,
         required: [true, "title khong duoic rong"],
@@ -28,9 +32,9 @@ let productsSchema = mongoose.Schema({
         ref: 'category',
         required: true
     },
-    isDeleted:{
-        type:Boolean,
-        default:false
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true

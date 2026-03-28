@@ -2,7 +2,7 @@ let mongoose = require('mongoose');
 
 let inventorySchema = mongoose.Schema({
     product: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Types.ObjectId,
         ref: 'product',
         required: true,
         unique: true
@@ -22,8 +22,5 @@ let inventorySchema = mongoose.Schema({
         min: 0,
         default: 0
     }
-}, {
-    timestamps: true
-});
-
-module.exports = mongoose.model('inventory', inventorySchema);
+})
+module.exports = new mongoose.model('inventory',inventorySchema)
